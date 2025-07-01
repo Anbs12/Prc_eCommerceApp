@@ -1,5 +1,7 @@
 package com.example.prc_ecommerceapp.ui.screens
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,7 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.AssistChip
@@ -34,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -45,15 +48,17 @@ import com.example.prc_ecommerceapp.ui.viewmodel.ProductDetailViewModel
 /** Muestra la pantalla de detalles de producto.
  * @param productId El ID del producto a mostrar.
  * @param onBackClick Función a ejecutar al hacer clic en el botón de retroceso.
- * @param onAddToCart Función a ejecutar al agregar el producto al carrito.*/
+ * @param onAddToCart Agrega el producto al carrito.*/
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductDetailScreen(
     productId: Int,
     onBackClick: () -> Unit,
     onAddToCart: () -> Unit,
+    context: Context = LocalContext.current,
     viewModel: ProductDetailViewModel = hiltViewModel()
 ) {
+    val showMessage = Toast.makeText(context, "Producto agregado al carrito", Toast.LENGTH_SHORT)
     val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(productId) {
@@ -68,7 +73,7 @@ fun ProductDetailScreen(
             navigationIcon = {
                 IconButton(onClick = onBackClick) {
                     Icon(
-                        imageVector = Icons.Default.ArrowBack,
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Back"
                     )
                 }
@@ -185,6 +190,7 @@ fun ProductDetailScreen(
                     onClick = {
                         viewModel.addToCart()
                         onAddToCart()
+                        showMessage.show()
                     },
                     modifier = Modifier
                         .fillMaxWidth()

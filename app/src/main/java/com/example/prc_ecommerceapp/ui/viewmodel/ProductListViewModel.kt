@@ -32,6 +32,9 @@ class ProductListViewModel @Inject constructor(
     private val _categories = MutableStateFlow<List<String>>(emptyList())
     val categories: StateFlow<List<String>> = _categories.asStateFlow()
 
+    /** Lista de elementos en el carrito de compras.*/
+    val cartItems = repository.getCartItems()
+
     //Carga los productos y las categorías al inicializar el ViewModel.
     init {
         loadProducts()

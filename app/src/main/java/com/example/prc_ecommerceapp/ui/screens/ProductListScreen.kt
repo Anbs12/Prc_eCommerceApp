@@ -1,5 +1,7 @@
 package com.example.prc_ecommerceapp.ui.screens
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,6 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
@@ -41,6 +44,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -60,6 +64,7 @@ fun ProductListScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val categories by viewModel.categories.collectAsState()
+    val cartItems by viewModel.cartItems.collectAsState(emptyList())
     var selectedCategory by remember { mutableStateOf("All") }
 
     Column(
@@ -70,10 +75,22 @@ fun ProductListScreen(
             title = { Text("Prc_TiendaDemo") },
             actions = {
                 IconButton(onClick = onCartClick) {
-                    Icon(
-                        imageVector = Icons.Default.ShoppingCart,
-                        contentDescription = "Cart"
-                    )
+                    //Cart badge number
+                    BadgedBox(
+                        badge = {
+                            if (cartItems.isNotEmpty()) {
+                                val badgeNumber = cartItems.size
+                                androidx.compose.material3.Badge {
+                                    Text(text = badgeNumber.toString())
+                                }
+                            }
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ShoppingCart,
+                            contentDescription = "Cart"
+                        )
+                    }
                 }
             }
         )
@@ -149,14 +166,20 @@ fun ProductListScreen(
     }
 }
 
-/** Composable que muestra una tarjeta de producto. */
+/** Composable que muestra una tarjeta de producto.
+ * @param product El producto a mostrar.
+ * @param onProductClick Ir a la pantalla de detalles del producto.
+ * @param onAddToCart Añade el producto al carrito de compras.
+ * @param context Contexto de la aplicación.*/
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductCard(
     product: Product,
     onProductClick: () -> Unit,
-    onAddToCart: () -> Unit
+    onAddToCart: () -> Unit,
+    context: Context = LocalContext.current
 ) {
+    val showMessage = Toast.makeText(context, "Producto agregado al carrito", Toast.LENGTH_SHORT)
     Card(
         onClick = onProductClick,
         modifier = Modifier.fillMaxWidth()
@@ -213,7 +236,10 @@ fun ProductCard(
             Spacer(modifier = Modifier.height(8.dp))
 
             Button(
-                onClick = onAddToCart,
+                onClick = {
+                    onAddToCart()
+                    showMessage.show()
+                },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Icon(

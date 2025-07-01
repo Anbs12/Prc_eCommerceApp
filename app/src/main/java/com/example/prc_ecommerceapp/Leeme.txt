@@ -1,0 +1,2 @@
+
+String.format("%.2f", cartItem.totalPrice) es para formatear el precio con dos decimales.
